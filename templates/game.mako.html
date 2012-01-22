@@ -1,0 +1,26 @@
+<%inherit file="base.mako.html" />
+
+First seen ${h.days_since(c.game_model.created_on_timestamp)}
+(${h.yyyymmdd(c.game_model.created_on_timestamp)})<br />
+Last seen ${h.days_since(c.game_model.last_updated_on_timestamp)}
+(${h.yyyymmdd(c.game_model.last_updated_on_timestamp)})<br />
+Last price change ${h.days_since(c.game_model.price_last_changed_timestamp)}
+(${h.yyyymmdd(c.game_model.price_last_changed_timestamp)})
+
+<table>
+  <caption>
+    Price changes
+    <img src="/games/${c.game_model.steam_id}/sparkline?height=100&width=990&days=99" style="display: block" />
+  </caption>
+  <tbody>
+    % for price_change in c.game_model.price_change_list:
+      <tr>
+        <td>${h.yyyymmdd(price_change[0])}</td>
+        <td>${h.price(price_change[1])}</td>
+        <td>${h.days_since(price_change[0])}</td>
+      </tr>
+    % endfor
+  </tbody>
+</table>
+
+<%def name="title()">${c.game.name}</%def>

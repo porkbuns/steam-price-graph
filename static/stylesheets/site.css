@@ -1,0 +1,44 @@
+body {
+  background: #f3f3f3 url(/images/bkg.png) repeat-y top center;
+}
+#page {
+  margin: 0 auto;
+}
+.alt {
+  color: #666;
+  font-family: "Warnock Pro", "Goudy Old Style","Palatino","Book Antiqua", Georgia, serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+h1 small.alt {
+  font-size: 0.6em;
+}
+
+table.games {
+  margin-top: 0;
+}
+table.games td {
+  padding: 0;
+  vertical-align: middle;
+}
+table.games td.thumbnail {
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  vertical-align: top;
+  width: 125px;
+}
+table.games td.thumbnail img {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+table.games td.sparkline {
+  width: 60px;
+}
+
+footer {
+  border-top: 4px solid black;
+  margin-top: 14px;
+}

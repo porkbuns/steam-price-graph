@@ -1,0 +1,4 @@
+cron:
+- description: initiates price update cycle
+  url: /webhooks/update
+  schedule: every 24 hours

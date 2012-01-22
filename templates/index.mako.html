@@ -1,0 +1,49 @@
+<%inherit file="base.mako.html" />
+
+<form method="get" style="position: absolute; top: 0; right: 0; padding-top: 1em">
+    % if c.query:
+      <input type="text" name="q" value="${c.query}" style="width: 20em; display: inline" />
+    % else:
+      <input type="text" name="q" value="" style="width: 10em; display: inline" />
+    % endif
+  <button type="submit">Search</button>
+</form>
+
+<table class="games">
+  <thead><tr>
+    <td>
+      % if hasattr(c, 'games_query'):
+        <a href="/?page=${c.page - 1}">&laquo;</a> |
+        <a href="/?page=${c.page + 1}&cursor=${c.games_query.cursor()}"> Next &raquo;</a>
+      % endif
+    </td>
+    <th colspan="2">Title</th>
+    <th>Current price</th>
+    <th>Last changed</th>
+  </tr></thead>
+  <tbody>
+    % for game_model in c.games:
+      <% game = game_model.to_steam_api() %>
+      <tr>
+        <td class="thumbnail"><img src="${game.thumbnail}" />
+        <td>
+          ${game.name}<br />
+          <a href="${game.url}">Store</a> | <a href="/games/${game.id}">Price graph</a>
+        </td>
+        <td class="sparkline">
+          <img src="/games/${game.id}/sparkline" />
+        </td>
+        <td>${h.price(game.price)}</td>
+        <td>${h.days_since(game_model.price_last_changed_timestamp)}
+      </tr>
+    % endfor
+  </tbody>
+  <tfoot><tr>
+    <th colspan="5">
+      % if hasattr(c, 'games_query'):
+        <a href="/?page=${c.page - 1}">&laquo;</a> |
+        <a href="/?page=${c.page + 1}&cursor=${c.games_query.cursor()}"> Next &raquo;</a>
+      % endif
+    </td>
+  </tr></tfoot>
+</table>
