@@ -7,6 +7,7 @@ import SteamApi
 from models.properties import JsonProperty
 from search import Searchable
 
+
 class SteamGame(Searchable, db.Model):
     '''
     Simple model that stores all that we care about for a given steam game.

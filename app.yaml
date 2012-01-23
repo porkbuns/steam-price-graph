@@ -1,6 +1,7 @@
-application: steam-price-graph
-version: live
-runtime: python
+application: steam-price-graph-hrd
+version: live27
+runtime: python27
+threadsafe: true
 api_version: 1
 
 derived_file_type:
@@ -26,5 +27,5 @@ handlers:
   static_dir: static/images
 
 # the main handler
-- url: .*
-  script: main.py
+- url: /.*
+  script: main.app

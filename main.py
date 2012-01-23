@@ -157,17 +157,9 @@ class WebHookHandler(webapp2.RequestHandler):
         self.response.out.write('<br><a href="?page=%d">Next</a>' % (page + 1))
 
 
-application = webapp2.WSGIApplication(
+app = webapp2.WSGIApplication(
     [('/', IndexHandler),
      webapp2.Route('/games/<steam_id>/sparkline', SparklineHandler),
      webapp2.Route('/games/<steam_id>', GameHandler),
      webapp2.Route('/webhooks/<action>', WebHookHandler)],
     debug=True)
-
-
-def main():
-    util.run_wsgi_app(application)
-
-
-if __name__ == '__main__':
-    main()

@@ -1,6 +1,7 @@
+import json
+
 from google.appengine.ext import db
 from google.appengine.api import datastore_types
-from django.utils import simplejson
 
 class JsonProperty(db.TextProperty):
     def get_value_for_datastore(self, model_instance):
@@ -27,10 +28,10 @@ class JsonProperty(db.TextProperty):
         if value is None:
             return {}
         if isinstance(value, unicode) or isinstance(value, str):
-            return simplejson.loads(value)
+            return json.loads(value)
         return value
 
     def _deflate(self, value):
-        return simplejson.dumps(value)
+        return json.dumps(value)
 
     data_type = datastore_types.Text
