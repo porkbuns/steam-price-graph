@@ -176,7 +176,7 @@ class WebHookHandler(webapp2.RequestHandler):
             if not game_model:
                 game_model = models.SteamGame(key_name=game_key_name)
                 should_reindex = True
-            else
+            else:
                 should_reindex = game_model.name != game.name
 
             game_model.steam_id = game.id
