@@ -5,7 +5,7 @@ from django.utils import simplejson
 class JsonProperty(db.TextProperty):
     def get_value_for_datastore(self, model_instance):
         value = super(JsonProperty, self).get_value_for_datastore(model_instance)
-        return self._deflate(self.convert_field_to_property(value))
+        return db.Text(self._deflate(self.convert_field_to_property(value)))
 
     def convert_field_to_property(self, field):
         return field
