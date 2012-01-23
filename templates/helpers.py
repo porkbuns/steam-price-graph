@@ -29,8 +29,6 @@ def price(price):
         return '-'
 
 def sparkline_url(game_model, chart_type='ls', width=60, height=18, days=29):
-    game = game_model.to_steam_api()
-
     price_changes = game_model.price_change_list
     price_changes.append((0, None))
 
