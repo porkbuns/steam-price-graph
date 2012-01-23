@@ -31,7 +31,7 @@
           <a href="${game.url}">Store</a> | <a href="/games/${game.id}">Price graph</a>
         </td>
         <td class="sparkline">
-          <img src="/games/${game.id}/sparkline" />
+          <img src="${h.sparkline_url(game_model)}" height="18" width="60" />
         </td>
         <td>${h.price(game.price)}</td>
         <td>${h.days_since(game_model.price_last_changed_timestamp)}

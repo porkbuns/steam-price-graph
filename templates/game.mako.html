@@ -10,7 +10,7 @@ Last price change ${h.days_since(c.game_model.price_last_changed_timestamp)}
 <table>
   <caption>
     Price changes
-    <img src="/games/${c.game_model.steam_id}/sparkline?height=100&width=990&days=99" style="display: block" />
+    <img src="${h.sparkline_url(c.game_model, width=990, height=100, days=99)}" style="display: block" width="990" height="100" />
   </caption>
   <tbody>
     % for price_change in c.game_model.price_change_list:

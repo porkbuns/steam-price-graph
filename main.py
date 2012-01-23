@@ -86,53 +86,21 @@ class SparklineHandler(BaseHandler):
 
     def get(self, steam_id):
         chart_type = self.request.get('type', 'ls')
-        chart_width = int(self.request.get('width', SparklineHandler.DEFAULT_WIDTH))
-        chart_height = int(self.request.get('height', SparklineHandler.DEFAULT_HEIGHT))
-        chart_days = int(self.request.get('days', SparklineHandler.DEFAULT_NUMBER_OF_DAYS))
+        chart_width = int(self.request.get(
+            'width', SparklineHandler.DEFAULT_WIDTH))
+        chart_height = int(self.request.get(
+            'height', SparklineHandler.DEFAULT_HEIGHT))
+        chart_days = int(self.request.get(
+            'days', SparklineHandler.DEFAULT_NUMBER_OF_DAYS))
 
         self.game_model = models.SteamGame.get_by_key_name(models.SteamGame.get_key_name(steam_id))
         if not self.game_model:
             self.abort(404)  # could not find game
-        self.game = self.game_model.to_steam_api()
 
-        price_changes = self.game_model.price_change_list
-        price_changes.append((0, None))
-
-        i = 0
-        now = long(time.time())
-        values = []
-        for unused_day in xrange(0, chart_days):
-            while now <= price_changes[i][0]:
-                i += 1
-            value = price_changes[i][1]
-            if value is not None:
-                value = int(value * 100)
-            values.append(value)
-            now -= (60 * 60 * 24)
-        values.reverse()
-        values.append(None)
-        scale_max = 1
-        if self.game_model.current_price is not None:
-            scale_max = max(scale_max, int(self.game_model.current_price * 200))
-
-        max_price = 1
-        prices = [pair[1] for pair in self.game_model.price_change_list
-                  if pair[1] is not None]
-        if prices:
-            max_price = int(max(prices) * 100)
-        scale_max = max(scale_max, max_price)
-
-        graph = GChartWrapper.GChart(chart_type, values, encoding='text')
-        if any(values):
-            graph.scale(0, scale_max)
-        graph.color('0077CC')
-        graph.size(chart_width, chart_height)
-        graph.marker('B', 'E6F2FA', 0, 0, 0)
-        graph.marker('o', '003399', 0, len(values) - 2, 4)
-        graph.fill('bg', 's', '00000000')
-        graph.line(1,0,0)
-
-        self.redirect(graph.url)
+        url = helpers.sparkline_url(self.game_model, chart_type=chart_type,
+                                    width=chart_width, height=chart_height,
+                                    days=chart_days)
+        self.redirect(url)
 
 
 class WebHookHandler(webapp2.RequestHandler):
