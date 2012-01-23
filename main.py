@@ -115,6 +115,10 @@ class WebHookHandler(webapp2.RequestHandler):
             self.update()
         elif action == 'update_page':
             self.update_page(int(self.request.get('page')))
+        elif action == 'clear_list_props':
+          self.clear_list_props(
+                self.request.get('id', None),
+                int(self.request.get('page_size', 40)))
         else:
             self.abort(404)
 
@@ -155,6 +159,39 @@ class WebHookHandler(webapp2.RequestHandler):
             self.response.out.write('<br>')
         self.response.out.write('<br>Done.')
         self.response.out.write('<br><a href="?page=%d">Next</a>' % (page + 1))
+
+    def clear_list_props(self, id_, page_size):
+        def print_next_page(game):
+            if game is None:
+                return
+
+            self.response.out.write('Next page %s' % game.key().name())
+            self.response.out.write('''
+                <a href="/webhooks/clear_list_props?id=%s&page_size=%d">
+                    [Next Page &rsaquo;]</a>''' % (game.key().name(), page_size))
+            self.response.out.write('<br /><br />')
+
+        from google.appengine.api.datastore import Key
+
+        games = models.SteamGame.all()
+        if id_ is not None:
+            games = games.filter("__key__ >=", Key.from_path('SteamGame', id_))
+        games = games.fetch(page_size + 1)
+
+        if len(games) > page_size:
+            print_next_page(games[page_size])
+
+        for game in games[0:page_size]:
+            changed = False
+            if hasattr(game, 'pickled_price_change_list_price'):
+              delattr(game, 'pickled_price_change_list_price')
+              changed = True
+            if hasattr(game, 'pickled_price_change_list_date'):
+              delattr(game, 'pickled_price_change_list_date')
+              changed = True
+            self.response.out.write('Fixing %s (%s) - (%s)<br>' % (game.name, game.steam_id, changed))
+            if changed:
+              game.put()
 
 
 app = webapp2.WSGIApplication(

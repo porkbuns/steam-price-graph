@@ -8,7 +8,7 @@ from models.properties import JsonProperty
 from search import Searchable
 
 
-class SteamGame(Searchable, db.Model):
+class SteamGame(Searchable, db.Expando):
     '''
     Simple model that stores all that we care about for a given steam game.
     '''
