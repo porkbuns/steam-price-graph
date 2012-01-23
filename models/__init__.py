@@ -12,13 +12,13 @@ class SteamGame(Searchable, db.Model):
     '''
     Simple model that stores all that we care about for a given steam game.
     '''
-    name = db.StringProperty()
-    steam_id = db.StringProperty()
+    name = db.StringProperty(indexed=False)
+    steam_id = db.StringProperty(indexed=False)
     price_change_list = JsonProperty(default=[])
     price_last_changed = db.DateTimeProperty()
 
-    last_updated_on = db.DateTimeProperty(auto_now=True)
-    created_on = db.DateTimeProperty(auto_now_add=True)
+    last_updated_on = db.DateTimeProperty(auto_now=True, indexed=False)
+    created_on = db.DateTimeProperty(auto_now_add=True, indexed=False)
 
     INDEX_TITLE_FROM_PROP = 'name'
     INDEX_ONLY = [ 'name' ]
