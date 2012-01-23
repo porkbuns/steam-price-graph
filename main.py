@@ -115,12 +115,6 @@ class WebHookHandler(webapp2.RequestHandler):
             self.update()
         elif action == 'update_page':
             self.update_page(int(self.request.get('page')))
-        elif action == 'clear_apps_with_snr_token':
-            self.clear_apps_with_snr_token(bool(self.request.get('confirm_delete')))
-        elif action == 'convert_none_values_for_prices':
-            self.convert_none_values_for_prices(
-                self.request.get('id', None),
-                int(self.request.get('page_size', 40)))
         else:
             self.abort(404)
 
@@ -161,49 +155,6 @@ class WebHookHandler(webapp2.RequestHandler):
             self.response.out.write('<br>')
         self.response.out.write('<br>Done.')
         self.response.out.write('<br><a href="?page=%d">Next</a>' % (page + 1))
-
-    def clear_apps_with_snr_token(self, confirm_delete):
-        games = models.SteamGame.all(keys_only=True)
-        for game_key in games:
-          self.response.out.write('Found %s' % game_key.name())
-          if 'snr' in str(game_key.name()):
-              if confirm_delete:
-                  from google.appengine.ext import db
-                  self.response.out.write('... is deleted')
-                  db.delete(game_key)
-              else:
-                  self.response.out.write('... should be deleted')
-
-          self.response.out.write('<br />')
-
-    def convert_none_values_for_prices(self, id_, page_size):
-        def print_next_page(game):
-            if game is None:
-                return
-
-            self.response.out.write('Next page %s' % game.key().name())
-            self.response.out.write('''
-                <a href="/webhooks/convert_none_values_for_prices?id=%s&page_size=%d">
-                    [Next Page &rsaquo;]</a>''' % (game.key().name(), page_size))
-            self.response.out.write('<br /><br />')
-
-        from google.appengine.api.datastore import Key
-
-        games = models.SteamGame.all()
-        if id_ is not None:
-            games = games.filter("__key__ >=", Key.from_path('SteamGame', id_))
-        games = games.fetch(page_size + 1)
-
-        if len(games) > page_size:
-            print_next_page(games[page_size])
-
-        for game in games[0:page_size]:
-            self.response.out.write('Fixing %s (%s)<br>' % (game.name, game.steam_id))
-            def fix_tuple(t):
-                return (t[0], models.SteamGame._float_to_price(t[1]))
-            pcl = [fix_tuple(t) for t in game.price_change_list]
-            game.price_change_list = pcl
-            game.put()
 
 
 application = webapp2.WSGIApplication(
