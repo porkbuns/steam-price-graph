@@ -29,7 +29,9 @@ def price(price):
         return '-'
 
 def sparkline_url(game_model, chart_type='ls', width=60, height=18, days=29):
-    price_changes = game_model.price_change_list
+    # Copy the price change list, and then set up an initial state in the far
+    # past.
+    price_changes = game_model.price_change_list[:]
     price_changes.append((0, None))
 
     i = 0
