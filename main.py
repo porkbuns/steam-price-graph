@@ -139,11 +139,14 @@ class WebHookHandler(webapp2.RequestHandler):
 
     def update_page(self, page):
         games = SteamApi.get_games(page)
-        for game in games:
+        game_models = models.SteamGame.get_by_key_name(
+          [models.SteamGame.get_key_name(g.id) for g in games])
+        to_write = []
+        to_index = []
+        for game, game_model in zip(games, game_models):
             self.response.out.write('Starting: %s...' % game.name)
             game_key_name = models.SteamGame.get_key_name(game.id)
 
-            game_model = models.SteamGame.get_by_key_name(game_key_name)
             should_reindex = False
             if not game_model:
                 game_model = models.SteamGame(key_name=game_key_name)
@@ -154,15 +157,21 @@ class WebHookHandler(webapp2.RequestHandler):
             game_model.steam_id = game.id
             game_model.name = game.name
             game_model.current_price = game.price
-            game_model.put()
+            to_write.append(game_model)
 
             # Only reindex if the entry is new, or the name has changed.
             if should_reindex:
-                game_model.index()
+                to_index.append(game_model)
 
             self.response.out.write('done -- ')
             self.response.out.write('%r' % game_model.price_change_list)
+            self.response.out.write(' to_index=%r' % should_reindex)
             self.response.out.write('<br>')
+        self.response.out.write('Writing...')
+        db.put(to_write)
+        for game_model in to_index:
+          game_model.index()
+        self.response.out.write('done<br>')
         self.response.out.write('<br>Done.')
         self.response.out.write('<br><a href="?page=%d">Next</a>' % (page + 1))
 
