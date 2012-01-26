@@ -1,0 +1,4 @@
+backends:
+- name: webhook-backend
+  instances: 1
+  options: dynamic

@@ -5,7 +5,8 @@ import datetime
 import time
 import os
 
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
+from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 
@@ -111,19 +112,28 @@ class WebHookHandler(webapp2.RequestHandler):
         self.process(action)
 
     def process(self, action):
-        if action == 'update':
+        if action == 'queue_update':
+            self.queue_update()
+        elif action == 'update':
             self.update()
         elif action == 'update_page':
             self.update_page(int(self.request.get('page')))
         else:
             self.abort(404)
 
+    def queue_update(self):
+        taskqueue.add(queue_name='updater-queue',
+                      url='/webhooks/update',
+                      method='GET',
+                      target='webhook-backend')
+
     def update(self):
         number_of_pages = SteamApi.get_number_of_pages()
         for page in xrange(1, number_of_pages + 1):
-            task = taskqueue.Task(url='/webhooks/update_page?page=%d' % page,
-                                  method='GET')
-            task.add('updater-queue')
+            taskqueue.add(queue_name='updater-queue',
+                          url='/webhooks/update_page?page=%d' % page,
+                          method='GET',
+                          target='webhook-backend')
             self.response.out.write('...page %d<br>' % page)
         self.response.out.write('Enqueued %d pages' % number_of_pages)
 
